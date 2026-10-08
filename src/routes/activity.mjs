@@ -1,16 +1,18 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const Event = require('../models/Event');
-const Album = require('../models/Album');
-const Poll = require('../models/Poll');
-const TicketType = require('../models/TicketType');
-const TicketPurchase = require('../models/TicketPurchase');
-const ShoppingItem = require('../models/ShoppingItem');
-const CarpoolOffer = require('../models/CarpoolOffer');
-const { authenticate, optionalAuthenticate } = require('../middleware/auth');
-const validate = require('../middleware/validate');
-const asyncHandler = require('../utils/asyncHandler');
-const httpError = require('../utils/httpError');
+import express from 'express';
+const router = express.Router();
+import expressValidator from 'express-validator';
+const { body } = expressValidator;
+import Event from '../models/Event.mjs';
+import Album from '../models/Album.mjs';
+import Poll from '../models/Poll.mjs';
+import TicketType from '../models/TicketType.mjs';
+import TicketPurchase from '../models/TicketPurchase.mjs';
+import ShoppingItem from '../models/ShoppingItem.mjs';
+import CarpoolOffer from '../models/CarpoolOffer.mjs';
+import { authenticate, optionalAuthenticate } from '../middleware/auth.mjs';
+import validate from '../middleware/validate.mjs';
+import asyncHandler from '../utils/asyncHandler.mjs';
+import httpError from '../utils/httpError.mjs';
 
 const includes = (list, id) => list.some((item) => String(item?._id || item) === String(id));
 async function loadEvent(id) {
@@ -211,4 +213,4 @@ router.post('/carpools/:offerId/join', authenticate, asyncHandler(async (req, re
   res.json({ data: updated });
 }));
 
-module.exports = router;
+export default router;

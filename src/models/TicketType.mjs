@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ticketTypeSchema = new mongoose.Schema({
   event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true, index: true },
@@ -10,4 +10,4 @@ const ticketTypeSchema = new mongoose.Schema({
   remaining: { type: Number, required: true, min: 0, validate: Number.isInteger }
 }, { timestamps: true, versionKey: false });
 
-module.exports = mongoose.model('TicketType', ticketTypeSchema);
+export default mongoose.model('TicketType', ticketTypeSchema);

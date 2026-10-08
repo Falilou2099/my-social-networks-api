@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -16,4 +16,4 @@ const albumSchema = new mongoose.Schema({
   photos: [photoSchema]
 }, { timestamps: true, versionKey: false });
 
-module.exports = mongoose.model('Album', albumSchema);
+export default mongoose.model('Album', albumSchema);

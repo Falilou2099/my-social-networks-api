@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const carpoolOfferSchema = new mongoose.Schema({
   event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true, index: true },
@@ -13,4 +13,4 @@ const carpoolOfferSchema = new mongoose.Schema({
   passengers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true, versionKey: false });
 
-module.exports = mongoose.model('CarpoolOffer', carpoolOfferSchema);
+export default mongoose.model('CarpoolOffer', carpoolOfferSchema);

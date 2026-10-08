@@ -1,12 +1,14 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const validate = require('../middleware/validate');
-const asyncHandler = require('../utils/asyncHandler');
-const { authenticate } = require('../middleware/auth');
-const httpError = require('../utils/httpError');
+import express from 'express';
+const router = express.Router();
+import expressValidator from 'express-validator';
+const { body } = expressValidator;
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.mjs';
+import validate from '../middleware/validate.mjs';
+import asyncHandler from '../utils/asyncHandler.mjs';
+import { authenticate } from '../middleware/auth.mjs';
+import httpError from '../utils/httpError.mjs';
 
 router.post('/register',
   body('firstName').trim().notEmpty().isLength({ max: 80 }),
@@ -39,4 +41,4 @@ router.post('/login',
 
 router.get('/me', authenticate, (req, res) => res.json({ data: req.user }));
 
-module.exports = router;
+export default router;

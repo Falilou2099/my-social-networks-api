@@ -1,6 +1,6 @@
 # My Social Networks API
 
-API REST en Node.js, Express et MongoDB pour gerer des utilisateurs, des groupes et des evenements avec leurs discussions et activites.
+API REST en Node.js (modules ES `.mjs`), Express et MongoDB pour gerer des utilisateurs, des groupes et des evenements avec leurs discussions et activites.
 
 ## Prerequis
 

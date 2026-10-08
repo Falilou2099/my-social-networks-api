@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const eventSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 160 },
@@ -23,4 +23,4 @@ eventSchema.pre('validate', function validateDates(next) {
   next();
 });
 
-module.exports = mongoose.model('Event', eventSchema);
+export default mongoose.model('Event', eventSchema);

@@ -1,13 +1,15 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const Thread = require('../models/Thread');
-const Message = require('../models/Message');
-const Group = require('../models/Group');
-const Event = require('../models/Event');
-const { authenticate, optionalAuthenticate } = require('../middleware/auth');
-const validate = require('../middleware/validate');
-const asyncHandler = require('../utils/asyncHandler');
-const httpError = require('../utils/httpError');
+import express from 'express';
+const router = express.Router();
+import expressValidator from 'express-validator';
+const { body } = expressValidator;
+import Thread from '../models/Thread.mjs';
+import Message from '../models/Message.mjs';
+import Group from '../models/Group.mjs';
+import Event from '../models/Event.mjs';
+import { authenticate, optionalAuthenticate } from '../middleware/auth.mjs';
+import validate from '../middleware/validate.mjs';
+import asyncHandler from '../utils/asyncHandler.mjs';
+import httpError from '../utils/httpError.mjs';
 
 const contains = (list, id) => list.some((item) => String(item?._id || item) === String(id));
 async function canRead(thread, userId) {
@@ -57,4 +59,4 @@ router.post('/:id/messages', authenticate,
     res.status(201).json({ data: message });
   }));
 
-module.exports = router;
+export default router;

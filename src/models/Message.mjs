@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
   thread: { type: mongoose.Schema.Types.ObjectId, ref: 'Thread', required: true, index: true },
@@ -7,4 +7,4 @@ const messageSchema = new mongoose.Schema({
   parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Message', default: null }
 }, { timestamps: true, versionKey: false });
 
-module.exports = mongoose.model('Message', messageSchema);
+export default mongoose.model('Message', messageSchema);

@@ -1,12 +1,14 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const Group = require('../models/Group');
-const Thread = require('../models/Thread');
-const Event = require('../models/Event');
-const { authenticate, optionalAuthenticate } = require('../middleware/auth');
-const validate = require('../middleware/validate');
-const asyncHandler = require('../utils/asyncHandler');
-const httpError = require('../utils/httpError');
+import express from 'express';
+const router = express.Router();
+import expressValidator from 'express-validator';
+const { body } = expressValidator;
+import Group from '../models/Group.mjs';
+import Thread from '../models/Thread.mjs';
+import Event from '../models/Event.mjs';
+import { authenticate, optionalAuthenticate } from '../middleware/auth.mjs';
+import validate from '../middleware/validate.mjs';
+import asyncHandler from '../utils/asyncHandler.mjs';
+import httpError from '../utils/httpError.mjs';
 
 const isId = (list, id) => list.some((item) => String(item?._id || item) === String(id));
 const requireAdmin = (group, userId) => {
@@ -116,4 +118,4 @@ router.post('/:id/events', authenticate,
     res.status(201).json({ data: event });
   }));
 
-module.exports = router;
+export default router;

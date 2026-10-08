@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const shoppingItemSchema = new mongoose.Schema({
   event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
@@ -10,4 +10,4 @@ const shoppingItemSchema = new mongoose.Schema({
 }, { timestamps: true, versionKey: false });
 
 shoppingItemSchema.index({ event: 1, normalizedName: 1 }, { unique: true });
-module.exports = mongoose.model('ShoppingItem', shoppingItemSchema);
+export default mongoose.model('ShoppingItem', shoppingItemSchema);

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 function notFound(req, res) {
   res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ressource introuvable' } });
@@ -27,4 +27,4 @@ function errorHandler(error, req, res, next) {
   res.status(status).json({ error: { code, message, ...(details ? { details } : {}) } });
 }
 
-module.exports = { notFound, errorHandler };
+export { notFound, errorHandler };

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const threadSchema = new mongoose.Schema({
   group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', default: null },
@@ -10,4 +10,4 @@ threadSchema.pre('validate', function validateOwner(next) {
   next();
 });
 
-module.exports = mongoose.model('Thread', threadSchema);
+export default mongoose.model('Thread', threadSchema);

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 async function connectDatabase(uri = process.env.MONGODB_URI) {
   if (!uri) throw new Error('MONGODB_URI est obligatoire');
@@ -6,4 +6,4 @@ async function connectDatabase(uri = process.env.MONGODB_URI) {
   console.log('Connexion MongoDB etablie');
 }
 
-module.exports = connectDatabase;
+export default connectDatabase;

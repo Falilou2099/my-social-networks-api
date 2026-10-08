@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('../utils/asyncHandler');
-const httpError = require('../utils/httpError');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import asyncHandler from '../utils/asyncHandler.mjs';
+import httpError from '../utils/httpError.mjs';
+import User from '../models/User.mjs';
 
 const authenticate = asyncHandler(async (req, res, next) => {
   const token = req.get('authorization')?.replace(/^Bearer\s+/i, '');
@@ -31,4 +31,4 @@ const optionalAuthenticate = asyncHandler(async (req, res, next) => {
   next();
 });
 
-module.exports = { authenticate, optionalAuthenticate };
+export { authenticate, optionalAuthenticate };

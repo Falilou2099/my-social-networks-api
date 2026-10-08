@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ticketPurchaseSchema = new mongoose.Schema({
   event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
@@ -11,4 +11,4 @@ const ticketPurchaseSchema = new mongoose.Schema({
 }, { timestamps: true, versionKey: false });
 
 ticketPurchaseSchema.index({ event: 1, email: 1 }, { unique: true });
-module.exports = mongoose.model('TicketPurchase', ticketPurchaseSchema);
+export default mongoose.model('TicketPurchase', ticketPurchaseSchema);

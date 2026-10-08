@@ -1,10 +1,12 @@
-const router = require('express').Router();
-const { body } = require('express-validator');
-const User = require('../models/User');
-const { authenticate } = require('../middleware/auth');
-const validate = require('../middleware/validate');
-const asyncHandler = require('../utils/asyncHandler');
-const httpError = require('../utils/httpError');
+import express from 'express';
+const router = express.Router();
+import expressValidator from 'express-validator';
+const { body } = expressValidator;
+import User from '../models/User.mjs';
+import { authenticate } from '../middleware/auth.mjs';
+import validate from '../middleware/validate.mjs';
+import asyncHandler from '../utils/asyncHandler.mjs';
+import httpError from '../utils/httpError.mjs';
 
 router.get('/:id', asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select('firstName lastName avatarUrl bio createdAt');
@@ -24,4 +26,4 @@ router.patch('/me', authenticate,
     res.json({ data: user });
   }));
 
-module.exports = router;
+export default router;

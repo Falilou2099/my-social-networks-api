@@ -2,10 +2,10 @@
   "name": "my-social-networks-api",
   "version": "1.0.0",
   "description": "API REST de gestion d'evenements et de groupes",
-  "main": "src/server.js",
+  "main": "src/server.mjs",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js"
+    "start": "node src/server.mjs",
+    "dev": "node src/server.mjs"
   },
   "engines": { "node": ">=18" },
   "dependencies": {

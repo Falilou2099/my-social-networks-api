@@ -1,4 +1,4 @@
-module.exports = {
+const openapi = {
   openapi: '3.0.3',
   info: {
     title: 'My Social Networks API',
@@ -49,3 +49,5 @@ module.exports = {
     '/carpools/{offerId}/join': { post: { summary: 'Reserver une place de covoiturage', security: [{ bearerAuth: [] }], responses: { 200: { description: 'Place reservee' }, 409: { description: 'Aucune place disponible' } } } }
   }
 };
+
+export default openapi;
