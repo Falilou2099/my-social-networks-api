@@ -17,6 +17,9 @@ app.use(rateLimit({ windowMs: 60 * 1000, limit: 120, standardHeaders: 'draft-7',
 app.get('/health', (req, res) => res.json({ data: { status: 'ok' } }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/groups', require('./routes/groups'));
+app.use('/api/events', require('./routes/events'));
+app.use('/api/threads', require('./routes/threads'));
 
 const openapi = swaggerJsdoc({
   definition: {
