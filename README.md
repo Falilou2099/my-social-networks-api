@@ -22,6 +22,8 @@ npm run dev
 
 L'API ecoute par defaut sur `http://localhost:3000`. La page interactive est disponible sur `/docs`, le document OpenAPI sur `/openapi.json` et l'etat du service sur `/health`.
 
+Le guide Swagger et Postman se trouve dans [`docs/TESTER_API.md`](docs/TESTER_API.md). La collection importable est dans [`postman/My-Social-Networks-API.postman_collection.json`](postman/My-Social-Networks-API.postman_collection.json).
+
 ## Authentification
 
 Creer un compte avec `POST /api/auth/register`, puis obtenir un jeton avec `POST /api/auth/login`. Pour les routes protegees, envoyer :

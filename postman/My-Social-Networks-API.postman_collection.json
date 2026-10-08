@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "My Social Networks API",
+    "description": "Parcours de test de l'API : documentation, inscription, authentification, groupes, evenements et activites. Lancer les requetes dans l'ordre avec le Collection Runner. Les scripts recuperent automatiquement les identifiants et le JWT.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "email", "value": "" },
+    { "key": "password", "value": "Demo-password-2026!" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "groupId", "value": "" },
+    { "key": "groupThreadId", "value": "" },
+    { "key": "eventId", "value": "" },
+    { "key": "threadId", "value": "" },
+    { "key": "pollId", "value": "" },
+    { "key": "questionId", "value": "" },
+    { "key": "optionId", "value": "" },
+    { "key": "photoId", "value": "" },
+    { "key": "ticketTypeId", "value": "" },
+    { "key": "carpoolOfferId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('API en ligne', () => pm.response.to.have.status(200));", "pm.test('Statut ok', () => pm.expect(pm.response.json().data.status).to.eql('ok'));" ] } }]
+    },
+    {
+      "name": "Swagger - document OpenAPI",
+      "request": { "method": "GET", "url": "{{baseUrl}}/openapi.json" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Document OpenAPI disponible', () => pm.response.to.have.status(200));", "pm.test('Version OpenAPI 3', () => pm.expect(pm.response.json().openapi).to.match(/^3\\./));"] } }]
+    },
+    {
+      "name": "Swagger UI",
+      "request": { "method": "GET", "url": "{{baseUrl}}/docs/" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Swagger UI disponible', () => pm.response.to.have.status(200));", "pm.test('Page Swagger', () => pm.expect(pm.response.text()).to.include('swagger-ui'));" ] } }]
+    },
+    {
+      "name": "Inscription (email de test unique)",
+      "event": [{ "listen": "prerequest", "script": { "type": "text/javascript", "exec": ["pm.collectionVariables.set('email', 'api-test-' + Date.now() + '@example.com');"] } }, { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Compte cree', () => pm.response.to.have.status(201));", "const data = pm.response.json().data;", "pm.collectionVariables.set('userId', data._id);", "pm.test('Mot de passe absent de la reponse', () => pm.expect(data.passwordHash).to.be.undefined);" ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"firstName\": \"Ada\",\n  \"lastName\": \"Test\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/auth/register" }
+    },
+    {
+      "name": "Connexion et recuperation du JWT",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Connexion reussie', () => pm.response.to.have.status(200));", "const data = pm.response.json().data;", "pm.collectionVariables.set('token', data.token);", "pm.collectionVariables.set('userId', data.user._id);", "pm.test('JWT present', () => pm.expect(data.token).to.be.a('string').and.not.empty);" ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/auth/login" }
+    },
+    {
+      "name": "Mon profil authentifie",
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/auth/me" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Profil accessible', () => pm.response.to.have.status(200));", "pm.test('Profil Ada', () => pm.expect(pm.response.json().data.email).to.eql(pm.collectionVariables.get('email')));" ] } }]
+    },
+    {
+      "name": "Creer un groupe public",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Groupe API test\",\n  \"description\": \"Groupe cree par la collection Postman\",\n  \"visibility\": \"public\",\n  \"allowMemberPosts\": true,\n  \"allowMemberEvents\": true\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/groups" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Groupe cree', () => pm.response.to.have.status(201));", "const data = pm.response.json().data;", "pm.collectionVariables.set('groupId', data._id);", "pm.collectionVariables.set('groupThreadId', data.thread);"] } }]
+    },
+    {
+      "name": "Creer un evenement avec les options",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Evenement API test\",\n  \"description\": \"Evenement de verification cree par Postman\",\n  \"startsAt\": \"2027-05-20T17:00:00Z\",\n  \"endsAt\": \"2027-05-20T20:00:00Z\",\n  \"location\": \"Paris\",\n  \"visibility\": \"public\",\n  \"shoppingListEnabled\": true,\n  \"carpoolEnabled\": true,\n  \"ticketingEnabled\": true\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/events" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Evenement cree', () => pm.response.to.have.status(201));", "const data = pm.response.json().data;", "pm.collectionVariables.set('eventId', data._id);", "pm.collectionVariables.set('threadId', data.thread);", "pm.test('Createur organisateur et participant', () => { pm.expect(data.organizers.map(String)).to.include(pm.collectionVariables.get('userId')); pm.expect(data.participants.map(String)).to.include(pm.collectionVariables.get('userId')); });"] } }]
+    },
+    {
+      "name": "Fil de discussion - publier un message",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"body\": \"Message de test publie depuis Postman\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/threads/{{threadId}}/messages" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Message publie', () => pm.response.to.have.status(201));"] } }]
+    },
+    {
+      "name": "Album - ajouter une photo par URL",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"url\": \"https://example.com/photo-test.jpg\",\n  \"caption\": \"Photo de test\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/events/{{eventId}}/album/photos" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Photo ajoutee', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('photoId', pm.response.json().data._id);"] } }]
+    },
+    {
+      "name": "Album - commenter la photo",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"body\": \"Commentaire de test\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/events/{{eventId}}/album/photos/{{photoId}}/comments" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Commentaire cree', () => pm.response.to.have.status(201));"] } }]
+    },
+    {
+      "name": "Sondage - creer",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"Sondage API test\",\n  \"questions\": [\n    { \"text\": \"Quel choix ?\", \"options\": [{ \"text\": \"Option A\" }, { \"text\": \"Option B\" }] }\n  ]\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/events/{{eventId}}/polls" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Sondage cree', () => pm.response.to.have.status(201));", "const data = pm.response.json().data;", "pm.collectionVariables.set('pollId', data._id);", "pm.collectionVariables.set('questionId', data.questions[0]._id);", "pm.collectionVariables.set('optionId', data.questions[0].options[0]._id);"] } }]
+    },
+    {
+      "name": "Sondage - voter",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"answers\": [{ \"questionId\": \"{{questionId}}\", \"optionId\": \"{{optionId}}\" }]\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/polls/{{pollId}}/votes" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Vote enregistre', () => pm.response.to.have.status(200));"] } }]
+    },
+    {
+      "name": "Liste shopping - ajouter un article",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Article test {{userId}}\",\n  \"quantity\": 1,\n  \"arrivalAt\": \"2027-05-20T16:30:00Z\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/events/{{eventId}}/shopping-list" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Article ajoute', () => pm.response.to.have.status(201));"] } }]
+    },
+    {
+      "name": "Covoiturage - proposer un trajet",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"departureLocation\": \"Gare de Lyon, Paris\",\n  \"departureAt\": \"2027-05-20T15:00:00Z\",\n  \"price\": 0,\n  \"currency\": \"EUR\",\n  \"seatsTotal\": 3,\n  \"maxDeviationMinutes\": 30\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/events/{{eventId}}/carpools" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Trajet cree', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('carpoolOfferId', pm.response.json().data._id);"] } }]
+    },
+    {
+      "name": "Billetterie - creer un type de billet",
+      "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Billet test\",\n  \"amount\": 0,\n  \"quantity\": 2,\n  \"currency\": \"EUR\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/events/{{eventId}}/ticket-types" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Type de billet cree', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('ticketTypeId', pm.response.json().data._id);"] } }]
+    },
+    {
+      "name": "Billetterie - reserver un billet",
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"firstName\": \"Grace\",\n  \"lastName\": \"Tester\",\n  \"email\": \"ticket-{{userId}}@example.com\",\n  \"address\": \"1 rue de Test, Paris\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/ticket-types/{{ticketTypeId}}/purchases" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Billet reserve', () => pm.response.to.have.status(201));"] } }]
+    },
+    {
+      "name": "Verification - lister les evenements",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/events" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Liste des evenements accessible', () => pm.response.to.have.status(200));", "pm.test('Evenement cree trouve', () => pm.expect(pm.response.json().data.map(item => item._id)).to.include(pm.collectionVariables.get('eventId')));"] } }]
+    }
+  ]
+}
