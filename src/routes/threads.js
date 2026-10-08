@@ -4,7 +4,7 @@ const Thread = require('../models/Thread');
 const Message = require('../models/Message');
 const Group = require('../models/Group');
 const Event = require('../models/Event');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, optionalAuthenticate } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const asyncHandler = require('../utils/asyncHandler');
 const httpError = require('../utils/httpError');
@@ -25,7 +25,7 @@ async function canRead(thread, userId) {
   return Boolean(userId) && (contains(event.participants, userId) || contains(event.organizers, userId));
 }
 
-router.get('/:id/messages', asyncHandler(async (req, res) => {
+router.get('/:id/messages', optionalAuthenticate, asyncHandler(async (req, res) => {
   const thread = await Thread.findById(req.params.id);
   if (!thread) throw httpError(404, 'Fil introuvable', 'THREAD_NOT_FOUND');
   if (!await canRead(thread, req.user?.id)) throw httpError(req.user ? 403 : 401, 'Acces au fil refuse', 'FORBIDDEN');

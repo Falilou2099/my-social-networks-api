@@ -3,7 +3,7 @@ const { body } = require('express-validator');
 const Event = require('../models/Event');
 const Group = require('../models/Group');
 const Thread = require('../models/Thread');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, optionalAuthenticate } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const asyncHandler = require('../utils/asyncHandler');
 const httpError = require('../utils/httpError');
@@ -13,7 +13,7 @@ const organizerOnly = (event, userId) => {
   if (!includes(event.organizers, userId)) throw httpError(403, 'Droits organisateur requis', 'FORBIDDEN');
 };
 
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/', optionalAuthenticate, asyncHandler(async (req, res) => {
   const filter = req.query.mine === 'true'
     ? { $or: [{ organizers: req.user?.id }, { participants: req.user?.id }] }
     : { $or: [{ visibility: 'public' }, { organizers: req.user?.id }, { participants: req.user?.id }] };
@@ -40,14 +40,17 @@ router.post('/', authenticate,
       if (!group.allowMemberEvents && !includes(group.admins, req.user.id)) throw httpError(403, 'La creation d evenements est desactivee', 'FORBIDDEN');
       participants = [...group.members];
     }
-    const event = await Event.create({ ...req.body, group: group?.id || null, startsAt: new Date(req.body.startsAt), endsAt: new Date(req.body.endsAt), organizers: [req.user.id], participants });
+    const groupVisibility = group && group.visibility !== 'public';
+    const eventData = Object.fromEntries(['name', 'description', 'startsAt', 'endsAt', 'location', 'coverPhotoUrl', 'visibility', 'shoppingListEnabled', 'carpoolEnabled', 'ticketingEnabled'].map((key) => [key, req.body[key]]).filter(([, value]) => value !== undefined));
+    if (groupVisibility) eventData.visibility = 'private';
+    const event = await Event.create({ ...eventData, group: group?.id || null, startsAt: new Date(req.body.startsAt), endsAt: new Date(req.body.endsAt), organizers: [req.user.id], participants });
     const thread = await Thread.create({ event: event.id });
     event.thread = thread.id;
     await event.save();
     res.status(201).json({ data: event });
   }));
 
-router.get('/:id', asyncHandler(async (req, res) => {
+router.get('/:id', optionalAuthenticate, asyncHandler(async (req, res) => {
   const event = await Event.findById(req.params.id).populate('organizers', 'firstName lastName').populate('participants', 'firstName lastName avatarUrl').populate('group', 'name visibility');
   if (!event) throw httpError(404, 'Evenement introuvable', 'EVENT_NOT_FOUND');
   if (event.visibility === 'private' && !includes(event.participants, req.user?.id) && !includes(event.organizers, req.user?.id)) throw httpError(req.user ? 403 : 401, 'Acces a cet evenement refuse', 'FORBIDDEN');
@@ -67,6 +70,10 @@ router.patch('/:id', authenticate,
     organizerOnly(event, req.user.id);
     const fields = ['name', 'description', 'startsAt', 'endsAt', 'location', 'coverPhotoUrl', 'visibility', 'shoppingListEnabled', 'carpoolEnabled', 'ticketingEnabled'];
     for (const field of fields) if (req.body[field] !== undefined) event[field] = req.body[field];
+    if (event.group && event.visibility === 'public') {
+      const group = await Group.findById(event.group);
+      if (group && group.visibility !== 'public') event.visibility = 'private';
+    }
     await event.save();
     res.json({ data: event });
   }));
