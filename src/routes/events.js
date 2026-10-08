@@ -14,10 +14,12 @@ const organizerOnly = (event, userId) => {
 };
 
 router.get('/', optionalAuthenticate, asyncHandler(async (req, res) => {
-  const filter = req.query.mine === 'true'
-    ? { $or: [{ organizers: req.user?.id }, { participants: req.user?.id }] }
-    : { $or: [{ visibility: 'public' }, { organizers: req.user?.id }, { participants: req.user?.id }] };
   if (!req.user && req.query.mine === 'true') throw httpError(401, 'Authentification requise', 'AUTH_REQUIRED');
+  const filter = req.query.mine === 'true'
+    ? { $or: [{ organizers: req.user.id }, { participants: req.user.id }] }
+    : req.user
+      ? { $or: [{ visibility: 'public' }, { organizers: req.user.id }, { participants: req.user.id }] }
+      : { visibility: 'public' };
   const events = await Event.find(filter).populate('organizers', 'firstName lastName').populate('group', 'name visibility');
   res.json({ data: events });
 }));

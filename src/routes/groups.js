@@ -14,10 +14,12 @@ const requireAdmin = (group, userId) => {
 };
 
 router.get('/', optionalAuthenticate, asyncHandler(async (req, res) => {
-  const filter = req.query.mine === 'true'
-    ? { members: req.user?.id }
-    : { $or: [{ visibility: 'public' }, { members: req.user?.id }] };
   if (!req.user && req.query.mine === 'true') throw httpError(401, 'Authentification requise', 'AUTH_REQUIRED');
+  const filter = req.query.mine === 'true'
+    ? { members: req.user.id }
+    : req.user
+      ? { $or: [{ visibility: 'public' }, { members: req.user.id }] }
+      : { visibility: 'public' };
   res.json({ data: await Group.find(filter).select('name description iconUrl coverPhotoUrl visibility members admins createdAt') });
 }));
 

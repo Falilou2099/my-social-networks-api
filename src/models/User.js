@@ -9,5 +9,4 @@ const userSchema = new mongoose.Schema({
   bio: { type: String, trim: true, maxlength: 500, default: '' }
 }, { timestamps: true, versionKey: false });
 
-userSchema.index({ email: 1 }, { unique: true });
 module.exports = mongoose.model('User', userSchema);
